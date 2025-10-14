@@ -410,7 +410,7 @@ export const GET_PLAN = gql`
 `;
 
 export const GET_EXECUTION = gql`
-  query GetExecution($requestId: String!) {
+  query GetExecution($requestId: ID!) {
     getExecution(requestId: $requestId) {
       requestId
       status
