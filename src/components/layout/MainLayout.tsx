@@ -20,7 +20,7 @@ export function MainLayout() {
           <Navigation />
         </div>
       </div>
-      
+
       <ResizablePanelGroup direction="vertical">
         {/* Main Content Area */}
         <ResizablePanel defaultSize={bottomPanelSize === 0 ? 100 : 80} minSize={50}>
@@ -34,7 +34,7 @@ export function MainLayout() {
 
             {/* Center Panel - Active Query & Results */}
             <ResizablePanel defaultSize={50} minSize={40} className="overflow-hidden">
-              <CenterPanel 
+              <CenterPanel
                 onSelectRequest={setSelectedRequestId}
                 selectedRequestId={selectedRequestId}
               />
@@ -53,9 +53,9 @@ export function MainLayout() {
         {bottomPanelSize > 0 && (
           <>
             <ResizableHandle withHandle />
-            <ResizablePanel 
-              defaultSize={bottomPanelSize} 
-              minSize={20} 
+            <ResizablePanel
+              defaultSize={bottomPanelSize}
+              minSize={20}
               maxSize={60}
               onResize={setBottomPanelSize}
             >

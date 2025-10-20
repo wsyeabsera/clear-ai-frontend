@@ -1,714 +1,515 @@
 import { gql } from '@apollo/client';
 
-// Agent Configuration Queries
-export const LIST_AGENT_CONFIGS = gql`
-  query ListAgentConfigs($type: AgentType, $isActive: Boolean) {
-    listAgentConfigs(type: $type, isActive: $isActive) {
-      id
-      name
-      type
-      version
-      isDefault
-      isActive
-      description
-      config
-      metadata {
-        performanceMetrics {
-          avgConfidence
-          avgQualityScore
-          totalUsage
-        }
-      }
-      createdAt
-    }
-  }
-`;
-
-export const GET_AGENT_CONFIG = gql`
-  query GetAgentConfig($id: ID!) {
-    getAgentConfig(id: $id) {
-      id
-      name
-      type
-      version
-      isDefault
-      isActive
-      description
-      config
-      metadata {
-        performanceMetrics {
-          avgConfidence
-          avgQualityScore
-          totalUsage
-        }
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-export const GET_DEFAULT_CONFIG = gql`
-  query GetDefaultConfig($type: AgentType!) {
-    getDefaultConfig(type: $type) {
-      id
-      name
-      config
-    }
-  }
-`;
-
-export const LIST_STRATEGIES = gql`
-  query ListStrategies {
-    listAnalysisStrategies {
+// Tool Queries
+export const LIST_TOOLS = gql`
+  query ListTools {
+    listTools {
       name
       description
-      version
-    }
-    listSummarizationStrategies {
-      name
-      description
-      version
+      inputSchema
+      outputSchema
     }
   }
 `;
 
-// Agent Configuration Mutations
-export const CREATE_AGENT_CONFIG = gql`
-  mutation CreateAgentConfig($input: CreateAgentConfigInput!) {
-    createAgentConfig(input: $input) {
-      id
-      name
-      type
-      version
-      isDefault
-      isActive
-      description
-      config
-      createdAt
-    }
-  }
-`;
-
-export const UPDATE_AGENT_CONFIG = gql`
-  mutation UpdateAgentConfig($id: ID!, $input: UpdateAgentConfigInput!) {
-    updateAgentConfig(id: $id, input: $input) {
-      id
-      name
-      type
-      version
-      isDefault
-      isActive
-      description
-      config
-      updatedAt
-    }
-  }
-`;
-
-export const DELETE_AGENT_CONFIG = gql`
-  mutation DeleteAgentConfig($id: ID!) {
-    deleteAgentConfig(id: $id)
-  }
-`;
-
-export const SET_DEFAULT_CONFIG = gql`
-  mutation SetDefaultConfig($id: ID!) {
-    setDefaultConfig(id: $id) {
-      id
-      name
-      type
-      isDefault
-    }
-  }
-`;
-
-export const CLONE_AGENT_CONFIG = gql`
-  mutation CloneAgentConfig($id: ID!, $name: String!) {
-    cloneAgentConfig(id: $id, name: $name) {
-      id
-      name
-      type
-      version
-      isDefault
-      isActive
-      description
-      config
-      createdAt
-    }
-  }
-`;
-
-// Training & Feedback Queries
-export const GET_TRAINING_FEEDBACK = gql`
-  query GetTrainingFeedback($id: ID!) {
-    getTrainingFeedback(id: $id) {
-      id
-      requestId
-      configId
-      agentType
-      rating {
-        overall
-        accuracy
-        relevance
-        clarity
-        actionability
-      }
-      issues {
-        type
-        severity
-        description
-        suggestion
-      }
-      suggestions
-      metadata {
-        query
-        responseTime
-        confidence
-        qualityScore
-      }
-      createdAt
-    }
-  }
-`;
-
-export const LIST_TRAINING_FEEDBACK = gql`
-  query ListTrainingFeedback($configId: ID, $agentType: AgentType, $limit: Int, $offset: Int) {
-    listTrainingFeedback(configId: $configId, agentType: $agentType, limit: $limit, offset: $offset) {
-      id
-      requestId
-      configId
-      agentType
-      rating {
-        overall
-        accuracy
-        relevance
-        clarity
-        actionability
-      }
-      issues {
-        type
-        severity
-        description
-        suggestion
-      }
-      suggestions
-      createdAt
-    }
-  }
-`;
-
-export const GET_TRAINING_STATS = gql`
-  query GetTrainingStats($configId: ID!) {
-    getTrainingStats(configId: $configId) {
-      configId
-      totalFeedback
-      avgRating
-      commonIssues {
-        type
-        count
-        percentage
-      }
-      recentTrend
-      performanceMetrics {
-        avgConfidence
-        avgQualityScore
-        totalUsage
-      }
-      recommendations
-    }
-  }
-`;
-
-// Training & Feedback Mutations
-export const SUBMIT_FEEDBACK = gql`
-  mutation SubmitFeedback($input: SubmitFeedbackInput!) {
-    submitFeedback(input: $input) {
-      id
-      requestId
-      configId
-      agentType
-      rating {
-        overall
-        accuracy
-        relevance
-        clarity
-        actionability
-      }
-      createdAt
-    }
-  }
-`;
-
-export const TRAIN_CONFIG = gql`
-  mutation TrainConfig($configId: ID!, $options: TrainingOptionsInput) {
-    trainConfig(configId: $configId, options: $options) {
-      configId
-      status
+export const EXECUTE_TOOL = gql`
+  mutation ExecuteTool($name: String!, $params: JSON!) {
+    executeTool(name: $name, params: $params) {
+      success
+      data
+      error
       message
-      completedAt
+      meta
     }
   }
 `;
 
-export const APPLY_TRAINING_UPDATE = gql`
-  mutation ApplyTrainingUpdate($configId: ID!, $updateData: JSON!) {
-    applyTrainingUpdate(configId: $configId, updateData: $updateData) {
-      id
-      name
-      config
-      updatedAt
-    }
-  }
-`;
-
-// Queries
-export const GET_METRICS = gql`
-  query GetMetrics {
-    getMetrics {
-      totalRequests
-      successfulRequests
-      failedRequests
-      avgDuration
-      uptime
-    }
-  }
-`;
-
-export const GET_REQUEST_HISTORY = gql`
-  query GetRequestHistory($limit: Int, $userId: String) {
-    getRequestHistory(limit: $limit, userId: $userId) {
-      requestId
-      query
-      response {
-        requestId
-        message
-        toolsUsed
-        data
-        analysis {
-          summary
-          insights {
-            type
-            description
-            confidence
-            supportingData
-          }
-          entities {
-            id
-            type
-            name
-            attributes
-            relationships {
-              type
-              targetEntityId
-              strength
-            }
-          }
-          anomalies {
-            type
-            description
-            severity
-            affectedEntities
-            data
-          }
-          metadata {
-            toolResultsCount
-            successfulResults
-            failedResults
-            analysisTimeMs
-          }
-        }
-        metadata {
-          requestId
-          totalDurationMs
-          timestamp
-          error
-        }
-      }
-      timestamp
-      userId
-    }
-  }
-`;
-
-export const GET_REQUEST = gql`
-  query GetRequest($requestId: ID!) {
-    getRequest(requestId: $requestId) {
-      requestId
-      query
-      response {
-        requestId
-        message
-        toolsUsed
-        data
-        analysis {
-          summary
-          insights {
-            type
-            description
-            confidence
-            supportingData
-          }
-          entities {
-            id
-            type
-            name
-            attributes
-            relationships {
-              type
-              targetEntityId
-              strength
-            }
-          }
-          anomalies {
-            type
-            description
-            severity
-            affectedEntities
-            data
-          }
-          metadata {
-            toolResultsCount
-            successfulResults
-            failedResults
-            analysisTimeMs
-          }
-        }
-        metadata {
-          requestId
-          totalDurationMs
-          timestamp
-          error
-        }
-      }
-      timestamp
-      userId
-    }
-  }
-`;
-
+// Plan Queries
 export const GET_PLAN = gql`
-  query GetPlan($requestId: ID!) {
+  query GetPlan($requestId: String!) {
     getPlan(requestId: $requestId) {
       requestId
+      query
       plan {
+        metadata {
+          estimatedDurationMs
+          parallelSteps
+          query
+          requestId
+          totalSteps
+        }
         steps {
-          tool
-          params
           dependsOn
+          description
           parallel
+          params
+          tool
         }
       }
-      metadata {
-        query
-        timestamp
-        estimatedDurationMs
-      }
       status
+      createdAt
+      executionTimeMs
+      validationErrors
     }
   }
 `;
 
-export const GET_EXECUTION = gql`
-  query GetExecution($requestId: ID!) {
-    getExecution(requestId: $requestId) {
+export const GET_RECENT_PLANS = gql`
+  query GetRecentPlans($limit: Int) {
+    getRecentPlans(limit: $limit) {
       requestId
+      query
+      plan {
+        metadata {
+          estimatedDurationMs
+          parallelSteps
+          query
+          requestId
+          totalSteps
+        }
+        steps {
+          dependsOn
+      description
+          parallel
+          params
+          tool
+        }
+      }
       status
+      createdAt
+      executionTimeMs
+      validationErrors
+    }
+  }
+`;
+
+export const GET_PLAN_STATISTICS = gql`
+  query GetPlanStatistics {
+    getPlanStatistics {
+      total
+      byStatus {
+        pending
+        completed
+        failed
+        cancelled
+      }
+      byProvider {
+        provider
+        count
+      }
+      averageExecutionTime
+    }
+  }
+`;
+
+// Execution Queries
+export const GET_EXECUTION = gql`
+  query GetExecution($executionId: String!) {
+    getExecution(executionId: $executionId) {
+      executionId
+      planRequestId
+      status
+      startedAt
+      completedAt
       totalSteps
-      successfulSteps
+      completedSteps
       failedSteps
-      totalDuration
       results {
-        step
-        tool
-        status
-        duration
-        success
+        completedAt
+        dependencies
+        error
         params
         result
-        cached
-        error
-        timestamp
+        retryCount
+        startedAt
+        status
+        stepIndex
+        tool
       }
+      error
+    }
+  }
+`;
+
+export const GET_EXECUTIONS_BY_PLAN_ID = gql`
+  query GetExecutionsByPlanId($planRequestId: String!) {
+    getExecutionsByPlanId(planRequestId: $planRequestId) {
+      executionId
+      planRequestId
+      status
+      startedAt
+      completedAt
+      totalSteps
+      completedSteps
+      failedSteps
+      results {
+        completedAt
+        dependencies
+        error
+        params
+        result
+        retryCount
+        startedAt
+        status
+        stepIndex
+        tool
+      }
+      error
+    }
+  }
+`;
+
+export const GET_RECENT_EXECUTIONS = gql`
+  query GetRecentExecutions($limit: Int) {
+    getRecentExecutions(limit: $limit) {
+      executionId
+      planRequestId
+      status
+      startedAt
+      completedAt
+      totalSteps
+      completedSteps
+      failedSteps
+      results {
+        completedAt
+        dependencies
+        error
+        params
+        result
+        retryCount
+        startedAt
+        status
+        stepIndex
+        tool
+      }
+      error
+    }
+  }
+`;
+
+export const GET_EXECUTION_STATISTICS = gql`
+  query GetExecutionStatistics {
+    getExecutionStatistics {
+      total
+      byStatus {
+        pending
+        running
+        completed
+        failed
+        cancelled
+      }
+      averageExecutionTime
+      successRate
+      averageStepsPerExecution
+    }
+  }
+`;
+
+// Analysis Queries
+export const GET_ANALYSIS = gql`
+  query GetAnalysis($analysisId: String!) {
+    getAnalysis(analysisId: $analysisId) {
+      analysis_id
+      evaluation_metrics {
+        average_step_time_ms
+        efficiency_score
+        error_patterns
+        retry_frequency
+        step_success_rates
+        success_rate
+      }
+      failure_patterns
+      feedback
+      improvement_notes
+      plan_request_id
+      recommendations
+      success_indicators
+    }
+  }
+`;
+
+export const GET_ANALYSIS_BY_EXECUTION_ID = gql`
+  query GetAnalysisByExecutionId($executionId: String!) {
+    getAnalysisByExecutionId(executionId: $executionId) {
+      analysis_id
+      evaluation_metrics {
+        average_step_time_ms
+        efficiency_score
+        error_patterns
+        retry_frequency
+        step_success_rates
+        success_rate
+      }
+      failure_patterns
+      feedback
+      improvement_notes
+      plan_request_id
+      recommendations
+      success_indicators
+    }
+  }
+`;
+
+export const GET_ANALYSIS_STATISTICS = gql`
+  query GetAnalysisStatistics {
+    getAnalysisStatistics {
+      total
+      average_success_rate
+      average_efficiency_score
+      common_error_patterns
+      average_execution_time
+    }
+  }
+`;
+
+export const GET_HISTORICAL_CONTEXT = gql`
+  query GetHistoricalContext($query: String!, $limit: Int) {
+    getHistoricalContext(query: $query, limit: $limit) {
+      requestId
+      query
+      timestamp
+      summary
+    }
+  }
+`;
+
+// Summary Queries
+export const GET_SUMMARY = gql`
+  query GetSummary($summaryId: String!) {
+    getSummary(summaryId: $summaryId) {
+      content
+      execution_id
+      format
+      plan_request_id
+      structured_data {
+        answer
+        errors
+        execution_time_ms
+        key_results
+        recommendations
+        steps_executed
+        success
+        user_query
+      }
+      summary_id
+    }
+  }
+`;
+
+export const GET_SUMMARY_BY_EXECUTION_ID = gql`
+  query GetSummaryByExecutionId($executionId: String!) {
+    getSummaryByExecutionId(executionId: $executionId) {
+      content
+      execution_id
+      format
+      plan_request_id
+      structured_data {
+        answer
+        errors
+        execution_time_ms
+        key_results
+        recommendations
+        steps_executed
+        success
+        user_query
+      }
+      summary_id
+    }
+  }
+`;
+
+export const GET_SUMMARY_STATISTICS = gql`
+  query GetSummaryStatistics {
+    getSummaryStatistics {
+      total
+      by_format {
+        text
+        markdown
+        json
+        html
+      }
+      average_content_length
+      success_rate
+    }
+  }
+`;
+
+// Orchestrator Statistics
+export const GET_ORCHESTRATOR_STATISTICS = gql`
+  query GetOrchestratorStatistics {
+    getOrchestratorStatistics {
+      total_cycles
+      successful_cycles
+      failed_cycles
+      average_cycle_time_ms
+      success_rate
+      average_plan_steps
+      average_execution_time_ms
+      common_failure_patterns
+      top_queries
     }
   }
 `;
 
 // Mutations
-export const EXECUTE_QUERY = gql`
-  mutation ExecuteQuery($query: String!, $userId: String) {
-    executeQuery(query: $query, userId: $userId) {
-      requestId
-      message
-      toolsUsed
-      data
-      analysis {
-        summary
-        insights {
-          type
-          description
-          confidence
-          supportingData
-        }
-        entities {
-          id
-          type
-          name
-          attributes
-          relationships {
-            type
-            targetEntityId
-            strength
-          }
-        }
-        anomalies {
-          type
-          description
-          severity
-          affectedEntities
-          data
-        }
-        metadata {
-          toolResultsCount
-          successfulResults
-          failedResults
-          analysisTimeMs
-        }
-      }
-      metadata {
-        requestId
-        totalDurationMs
-        timestamp
-        error
-      }
-    }
-  }
-`;
-
-export const PLAN_QUERY = gql`
-  mutation PlanQuery($query: String!, $context: JSON) {
-    planQuery(query: $query, context: $context) {
-      requestId
+export const CREATE_PLAN = gql`
+  mutation CreatePlan($query: String!) {
+    createPlan(query: $query) {
+      createdAt
+      executionTimeMs
       plan {
+        metadata {
+          estimatedDurationMs
+          parallelSteps
+          query
+          requestId
+          totalSteps
+        }
         steps {
-          tool
-          params
           dependsOn
+          description
           parallel
+          params
+          tool
         }
       }
-      metadata {
         query
-        timestamp
-        estimatedDurationMs
-      }
+      requestId
       status
+      validationErrors
     }
   }
 `;
 
-export const EXECUTE_TOOLS = gql`
-  mutation ExecuteTools($requestId: ID!) {
-    executeTools(requestId: $requestId) {
-      requestId
+export const DELETE_PLAN = gql`
+  mutation DeletePlan($requestId: String!) {
+    deletePlan(requestId: $requestId)
+  }
+`;
+
+export const EXECUTE_PLAN = gql`
+  mutation ExecutePlan($planRequestId: String!) {
+    executePlan(planRequestId: $planRequestId) {
+      completedAt
+      completedSteps
+      error
+      executionId
+      failedSteps
+      planRequestId
       results {
-        success
+        completedAt
+        dependencies
+        error
+        params
+        result
+        retryCount
+        startedAt
+        status
+        stepIndex
         tool
-        data
-        error {
-          code
-          message
-          details
-        }
-        metadata {
-          executionTime
-          timestamp
-          retries
-        }
-      }
-      metadata {
-        totalDurationMs
-        successfulSteps
-        failedSteps
-        timestamp
       }
     }
   }
 `;
 
-export const ANALYZE_RESULTS = gql`
-  mutation AnalyzeResults($requestId: ID!, $analyzerConfigId: ID) {
-    analyzeResults(requestId: $requestId, analyzerConfigId: $analyzerConfigId) {
-      requestId
-      analysis {
-        summary
-        insights {
-          type
-          description
-          confidence
-          supportingData
-        }
-        entities {
-          id
-          type
-          name
-          attributes
-          relationships {
-            type
-            targetEntityId
-            strength
-          }
-        }
-        anomalies {
-          type
-          description
-          severity
-          affectedEntities
-          data
-        }
-        metadata {
-          toolResultsCount
-          successfulResults
-          failedResults
-          analysisTimeMs
-        }
+export const CANCEL_EXECUTION = gql`
+  mutation CancelExecution($executionId: String!) {
+    cancelExecution(executionId: $executionId)
+  }
+`;
+
+export const RETRY_EXECUTION = gql`
+  mutation RetryExecution($executionId: String!) {
+    retryExecution(executionId: $executionId) {
+      executionId
+      planRequestId
+      status
+      startedAt
+      completedAt
+      totalSteps
+      completedSteps
+      failedSteps
+      results {
+        completedAt
+        dependencies
+        error
+        params
+        result
+        retryCount
+        startedAt
+        status
+        stepIndex
+        tool
       }
-      metadata {
-        toolResultsCount
-        successfulResults
-        failedResults
-        analysisTimeMs
-      }
+      error
     }
   }
 `;
 
-export const SUMMARIZE_RESPONSE = gql`
-  mutation SummarizeResponse($requestId: ID!, $summarizerConfigId: ID) {
-    summarizeResponse(requestId: $requestId, summarizerConfigId: $summarizerConfigId) {
-      requestId
+export const ANALYZE_EXECUTION = gql`
+  mutation AnalyzeExecution($executionId: String!) {
+    analyzeExecution(executionId: $executionId) {
+      analysis_id
+      evaluation_metrics {
+        average_step_time_ms
+        efficiency_score
+        error_patterns
+        retry_frequency
+        step_success_rates
+        success_rate
+      }
+      failure_patterns
+      feedback
+      improvement_notes
+      plan_request_id
+      recommendations
+      success_indicators
+    }
+  }
+`;
+
+export const GENERATE_SUMMARY = gql`
+  mutation GenerateSummary($executionId: String!, $format: SummaryFormat) {
+    generateSummary(executionId: $executionId, format: $format) {
+      content
+      execution_id
+      format
+      plan_request_id
+      structured_data {
+        answer
+        errors
+        execution_time_ms
+        key_results
+        recommendations
+        steps_executed
+        success
+        user_query
+      }
+      summary_id
+    }
+  }
+`;
+
+export const PROVIDE_FEEDBACK = gql`
+  mutation ProvideFeedback($feedback: FeedbackRequestInput!) {
+    provideFeedback(feedback: $feedback) {
+      feedback_id
+      execution_id
+      user_feedback
+      rating
+      categories
+      processed
+      created_at
+    }
+  }
+`;
+
+export const PROVIDE_ANALYSIS_FEEDBACK = gql`
+  mutation ProvideAnalysisFeedback($planRequestId: String!, $analysisId: String!) {
+    provideAnalysisFeedback(planRequestId: $planRequestId, analysisId: $analysisId) {
+      success
       message
-      toolsUsed
-      metadata {
-        requestId
-        totalDurationMs
-        timestamp
-      }
-    }
-  }
-`;
-
-export const GET_ANALYSIS = gql`
-  query GetAnalysis($requestId: ID!) {
-    getAnalysis(requestId: $requestId) {
-      requestId
-      analysis {
-        summary
-        insights {
-          type
-          description
-          confidence
-          supportingData
-        }
-        entities {
-          id
-          type
-          name
-          attributes
-          relationships {
-            type
-            targetEntityId
-            strength
-          }
-        }
-        anomalies {
-          type
-          description
-          severity
-          affectedEntities
-          data
-        }
-        metadata {
-          toolResultsCount
-          successfulResults
-          failedResults
-          analysisTimeMs
-        }
-      }
-      metadata {
-        toolResultsCount
-        successfulResults
-        failedResults
-        analysisTimeMs
-      }
-    }
-  }
-`;
-
-export const CANCEL_QUERY = gql`
-  mutation CancelQuery($requestId: ID!) {
-    cancelQuery(requestId: $requestId)
-  }
-`;
-
-// Subscriptions
-export const QUERY_PROGRESS_SUBSCRIPTION = gql`
-  subscription QueryProgress($requestId: ID!) {
-    queryProgress(requestId: $requestId) {
-      requestId
-      phase
-      progress
-      message
-      timestamp
-    }
-  }
-`;
-
-export const PLANNER_PROGRESS_SUBSCRIPTION = gql`
-  subscription PlannerProgress($requestId: ID!) {
-    plannerProgress(requestId: $requestId) {
-      requestId
-      phase
-      progress
-      message
-      timestamp
-    }
-  }
-`;
-
-export const EXECUTOR_PROGRESS_SUBSCRIPTION = gql`
-  subscription ExecutorProgress($requestId: ID!) {
-    executorProgress(requestId: $requestId) {
-      requestId
-      phase
-      progress
-      message
-      currentStep
-      timestamp
-    }
-  }
-`;
-
-export const ANALYZER_PROGRESS_SUBSCRIPTION = gql`
-  subscription AnalyzerProgress($requestId: ID!) {
-    analyzerProgress(requestId: $requestId) {
-      requestId
-      phase
-      progress
-      message
-      timestamp
-    }
-  }
-`;
-
-export const SUMMARIZER_PROGRESS_SUBSCRIPTION = gql`
-  subscription SummarizerProgress($requestId: ID!) {
-    summarizerProgress(requestId: $requestId) {
-      requestId
-      phase
-      progress
-      message
-      timestamp
+      feedbackId
     }
   }
 `;

@@ -55,7 +55,7 @@ export function AgentProgressCard({ agent, progress }: AgentProgressCardProps) {
             <span className="text-lg">{config.icon}</span>
             <span className="font-medium text-sm">{config.name}</span>
           </div>
-          <Badge 
+          <Badge
             variant={isComplete ? "default" : isActive ? "secondary" : "outline"}
             className={cn(
               "text-xs",
@@ -67,8 +67,8 @@ export function AgentProgressCard({ agent, progress }: AgentProgressCardProps) {
           </Badge>
         </div>
 
-        <Progress 
-          value={progress.progress} 
+        <Progress
+          value={progress.progress}
           className="h-2 mb-2"
         />
 

@@ -17,7 +17,7 @@ interface TrainingStore {
   setStats: (configId: string, stats: TrainingStats) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // Computed values
   getFeedbackByConfig: (configId: string) => TrainingFeedback[];
   getFeedbackByAgentType: (agentType: AgentType) => TrainingFeedback[];
@@ -36,25 +36,25 @@ export const useTrainingStore = create<TrainingStore>()(
 
       // Actions
       setFeedback: (feedback) => set({ feedback, error: null }),
-      
+
       addFeedback: (feedback) => set((state) => ({
         feedback: [feedback, ...state.feedback]
       })),
-      
+
       updateFeedback: (id, updates) => set((state) => ({
-        feedback: state.feedback.map(feedback => 
+        feedback: state.feedback.map(feedback =>
           feedback.id === id ? { ...feedback, ...updates } : feedback
         )
       })),
-      
+
       removeFeedback: (id) => set((state) => ({
         feedback: state.feedback.filter(feedback => feedback.id !== id)
       })),
-      
+
       setStats: (configId, stats) => set((state) => ({
         stats: { ...state.stats, [configId]: stats }
       })),
-      
+
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
 
@@ -63,19 +63,19 @@ export const useTrainingStore = create<TrainingStore>()(
         const { feedback } = get();
         return feedback.filter(f => f.configId === configId);
       },
-      
+
       getFeedbackByAgentType: (agentType) => {
         const { feedback } = get();
         return feedback.filter(f => f.agentType === agentType);
       },
-      
+
       getRecentFeedback: (limit = 10) => {
         const { feedback } = get();
         return feedback
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, limit);
       },
-      
+
       getFeedbackStats: (configId) => {
         const { stats } = get();
         return stats[configId] || null;

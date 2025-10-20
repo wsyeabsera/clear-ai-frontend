@@ -17,7 +17,7 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     set((state) => {
       const newProgress = new Map(state.progress);
       const current = newProgress.get(requestId) || {};
-      
+
       newProgress.set(requestId, {
         ...current,
         [agent]: update,
@@ -49,7 +49,7 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     if (progress.executor?.progress === 100) return 'analyzing';
     if (progress.planner?.progress === 100) return 'executing';
     if (progress.planner) return 'planning';
-    
+
     return 'starting';
   },
 

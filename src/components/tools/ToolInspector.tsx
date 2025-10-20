@@ -23,7 +23,6 @@ export function ToolInspector({ requestId }: ToolInspectorProps) {
     pollInterval: requestId ? 1000 : 0, // Poll every second during execution
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const execution = (data as any)?.getExecution;
   const toolExecution = execution?.results || [];
 
@@ -37,23 +36,22 @@ export function ToolInspector({ requestId }: ToolInspectorProps) {
     setExpandedSteps(newExpanded);
   };
 
-  const getStatusIcon = (status: string, success: boolean | null) => {
-    if (status === 'running') return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
-    if (success === true) return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (success === false) return <XCircle className="h-4 w-4 text-red-500" />;
+  const getStatusIcon = (status: string) => {
+    if (status === 'RUNNING') return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
+    if (status === 'COMPLETED') return <CheckCircle className="h-4 w-4 text-green-500" />;
+    if (status === 'FAILED') return <XCircle className="h-4 w-4 text-red-500" />;
     return <Clock className="h-4 w-4 text-gray-400" />;
   };
 
-  const getStatusColor = (status: string, success: boolean | null) => {
-    if (status === 'running') return 'border-blue-200 bg-blue-50';
-    if (success === true) return 'border-green-200 bg-green-50';
-    if (success === false) return 'border-red-200 bg-red-50';
+  const getStatusColor = (status: string) => {
+    if (status === 'RUNNING') return 'border-blue-200 bg-blue-50';
+    if (status === 'COMPLETED') return 'border-green-200 bg-green-50';
+    if (status === 'FAILED') return 'border-red-200 bg-red-50';
     return 'border-gray-200 bg-gray-50';
   };
 
   const totalSteps = toolExecution.length;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const completedSteps = toolExecution.filter((t: any) => t.success === true).length;
+  const completedSteps = toolExecution.filter((t: any) => t.status === 'COMPLETED').length;
   const progress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
 
   if (loading) {
@@ -155,13 +153,12 @@ export function ToolInspector({ requestId }: ToolInspectorProps) {
         </CardHeader>
         <CardContent className="overflow-y-auto h-full">
           <div className="space-y-3">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {toolExecution.map((tool: any, index: number) => (
               <div
                 key={index}
                 className={cn(
                   "border rounded-lg transition-all",
-                  getStatusColor(tool.status, tool.success),
+                  getStatusColor(tool.status),
                   expandedSteps.has(index) && "shadow-sm"
                 )}
               >
@@ -176,27 +173,30 @@ export function ToolInspector({ requestId }: ToolInspectorProps) {
                       ) : (
                         <ChevronRight className="h-4 w-4" />
                       )}
-                      {getStatusIcon(tool.status, tool.success)}
+                      {getStatusIcon(tool.status)}
                       <div>
                         <p className="font-medium text-sm">
                           Step {index + 1}: {tool.tool}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {tool.duration}ms {tool.cached && '(cached)'}
+                          {tool.startedAt && tool.completedAt ?
+                            `${new Date(tool.completedAt).getTime() - new Date(tool.startedAt).getTime()}ms` :
+                            'Duration unknown'
+                          }
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {tool.cached && (
+                      {tool.retryCount > 0 && (
                         <Badge variant="outline" className="text-xs">
-                          Cache Hit
+                          Retries: {tool.retryCount}
                         </Badge>
                       )}
-                      <Badge 
+                      <Badge
                         variant={
-                          tool.success === true ? "default" :
-                          tool.success === false ? "destructive" :
-                          tool.status === 'running' ? "secondary" :
+                          tool.status === 'COMPLETED' ? "default" :
+                          tool.status === 'FAILED' ? "destructive" :
+                          tool.status === 'RUNNING' ? "secondary" :
                           "outline"
                         }
                         className="text-xs"
@@ -238,12 +238,17 @@ export function ToolInspector({ requestId }: ToolInspectorProps) {
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
                             <p className="text-muted-foreground">Duration</p>
-                            <p className="font-medium">{tool.duration}ms</p>
+                            <p className="font-medium">
+                              {tool.startedAt && tool.completedAt ?
+                                `${new Date(tool.completedAt).getTime() - new Date(tool.startedAt).getTime()}ms` :
+                                'Unknown'
+                              }
+                            </p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground">Cache</p>
+                            <p className="text-muted-foreground">Retries</p>
                             <p className="font-medium">
-                              {tool.cached ? 'Hit' : 'Miss'}
+                              {tool.retryCount || 0}
                             </p>
                           </div>
                         </div>

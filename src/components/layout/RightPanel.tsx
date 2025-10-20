@@ -11,7 +11,7 @@ interface RightPanelProps {
 export function RightPanel({ selectedRequestId }: RightPanelProps) {
   const { getActiveSession } = useSessionStore();
   const activeSession = getActiveSession();
-  
+
   const selectedMessage = activeSession?.messages.find(
     m => m.requestId === selectedRequestId
   );

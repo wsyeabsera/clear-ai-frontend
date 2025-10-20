@@ -13,6 +13,10 @@ interface SessionStore {
   renameSession: (sessionId: string, name: string) => void;
   getActiveSession: () => Session | null;
   getSession: (id: string) => Session | null;
+  // New methods for querying local history
+  getMessagesWithRequestData: () => Message[];
+  getSessionsByStatus: (status: Session['status']) => Session[];
+  searchMessages: (query: string) => Message[];
 }
 
 export const useSessionStore = create<SessionStore>()(
@@ -46,8 +50,8 @@ export const useSessionStore = create<SessionStore>()(
       closeSession: (id: string) => {
         set((state) => {
           const newSessions = state.sessions.filter((session) => session.id !== id);
-          const newActiveSessionId = 
-            state.activeSessionId === id 
+          const newActiveSessionId =
+            state.activeSessionId === id
               ? (newSessions.length > 0 ? newSessions[0].id : null)
               : state.activeSessionId;
 
@@ -94,6 +98,29 @@ export const useSessionStore = create<SessionStore>()(
       getSession: (id: string) => {
         const { sessions } = get();
         return sessions.find((session) => session.id === id) || null;
+      },
+
+      // New methods for querying local history
+      getMessagesWithRequestData: () => {
+        const { sessions } = get();
+        return sessions.flatMap(session =>
+          session.messages.filter(message => message.requestData)
+        );
+      },
+
+      getSessionsByStatus: (status: Session['status']) => {
+        const { sessions } = get();
+        return sessions.filter(session => session.status === status);
+      },
+
+      searchMessages: (query: string) => {
+        const { sessions } = get();
+        const lowercaseQuery = query.toLowerCase();
+        return sessions.flatMap(session =>
+          session.messages.filter(message =>
+            message.content.toLowerCase().includes(lowercaseQuery)
+          )
+        );
       },
     }),
     {

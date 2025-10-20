@@ -4,18 +4,20 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { 
-  MessageSquare, 
-  Settings, 
-  BarChart3, 
-  Star
+import {
+  MessageSquare,
+  FileText,
+  Play,
+  Wrench,
+  BarChart3
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Chat', href: '/', icon: MessageSquare },
-  { name: 'Configs', href: '/configs', icon: Settings },
-  { name: 'Training', href: '/training', icon: Star },
-  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+  { name: 'Plans', href: '/plans', icon: FileText },
+  { name: 'Executions', href: '/executions', icon: Play },
+  { name: 'Tools', href: '/tools', icon: Wrench },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 ];
 
 export function Navigation() {

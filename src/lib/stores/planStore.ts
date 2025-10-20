@@ -1,92 +1,48 @@
 import { create } from 'zustand';
-import { Plan, PlanStep } from '@/types';
+import { PlanResponse, ExecutionResponse } from '@/types';
 
 interface PlanStore {
-  currentPlan: Plan | null;
-  currentRequestId: string | null;
-  isEditing: boolean;
-  editedSteps: PlanStep[];
-  setPlan: (requestId: string, plan: Plan) => void;
-  startEditing: () => void;
-  stopEditing: () => void;
-  updateStep: (index: number, step: PlanStep) => void;
-  addStep: (step: PlanStep) => void;
-  removeStep: (index: number) => void;
-  reorderSteps: (fromIndex: number, toIndex: number) => void;
-  getEditedPlan: () => Plan;
-  hasChanges: () => boolean;
+  currentPlan: PlanResponse | null;
+  currentExecution: ExecutionResponse | null;
+  isExecuting: boolean;
+  setPlan: (plan: PlanResponse) => void;
+  setExecution: (execution: ExecutionResponse) => void;
+  setExecuting: (executing: boolean) => void;
   clearPlan: () => void;
+  clearExecution: () => void;
+  clearAll: () => void;
 }
 
-export const usePlanStore = create<PlanStore>((set, get) => ({
+export const usePlanStore = create<PlanStore>((set) => ({
   currentPlan: null,
-  currentRequestId: null,
-  isEditing: false,
-  editedSteps: [],
+  currentExecution: null,
+  isExecuting: false,
 
-  setPlan: (requestId: string, plan: Plan) => {
-    set({
-      currentPlan: plan,
-      currentRequestId: requestId,
-      editedSteps: [...plan.steps],
-      isEditing: false,
-    });
+  setPlan: (plan: PlanResponse) => {
+    set({ currentPlan: plan });
   },
 
-  startEditing: () => {
-    set({ isEditing: true });
+  setExecution: (execution: ExecutionResponse) => {
+    set({ currentExecution: execution });
   },
 
-  stopEditing: () => {
-    set({ isEditing: false });
-  },
-
-  updateStep: (index: number, step: PlanStep) => {
-    set((state) => ({
-      editedSteps: state.editedSteps.map((s, i) => (i === index ? step : s)),
-    }));
-  },
-
-  addStep: (step: PlanStep) => {
-    set((state) => ({
-      editedSteps: [...state.editedSteps, step],
-    }));
-  },
-
-  removeStep: (index: number) => {
-    set((state) => ({
-      editedSteps: state.editedSteps.filter((_, i) => i !== index),
-    }));
-  },
-
-  reorderSteps: (fromIndex: number, toIndex: number) => {
-    set((state) => {
-      const newSteps = [...state.editedSteps];
-      const [movedStep] = newSteps.splice(fromIndex, 1);
-      newSteps.splice(toIndex, 0, movedStep);
-      
-      return { editedSteps: newSteps };
-    });
-  },
-
-  getEditedPlan: () => {
-    const { editedSteps } = get();
-    return { steps: editedSteps };
-  },
-
-  hasChanges: () => {
-    const { currentPlan, editedSteps } = get();
-    if (!currentPlan) return false;
-    
-    return JSON.stringify(currentPlan.steps) !== JSON.stringify(editedSteps);
+  setExecuting: (executing: boolean) => {
+    set({ isExecuting: executing });
   },
 
   clearPlan: () => {
+    set({ currentPlan: null });
+  },
+
+  clearExecution: () => {
+    set({ currentExecution: null });
+  },
+
+  clearAll: () => {
     set({
       currentPlan: null,
-      currentRequestId: null,
-      editedSteps: [],
-      isEditing: false,
+      currentExecution: null,
+      isExecuting: false,
     });
   },
 }));
