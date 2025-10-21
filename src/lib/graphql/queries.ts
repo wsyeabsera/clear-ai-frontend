@@ -390,24 +390,27 @@ export const DELETE_PLAN = gql`
 export const EXECUTE_PLAN = gql`
   mutation ExecutePlan($planRequestId: String!) {
     executePlan(planRequestId: $planRequestId) {
-      completedAt
-      completedSteps
-      error
       executionId
-      failedSteps
       planRequestId
+      status
+      startedAt
+      completedAt
+      totalSteps
+      completedSteps
+      failedSteps
       results {
-        completedAt
-        dependencies
-        error
-        params
-        result
-        retryCount
-        startedAt
-        status
         stepIndex
         tool
+        status
+        params
+        result
+        error
+        startedAt
+        completedAt
+        retryCount
+        dependencies
       }
+      error
     }
   }
 `;

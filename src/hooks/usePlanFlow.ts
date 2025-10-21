@@ -99,7 +99,7 @@ export function usePlanFlow() {
       if (!analysisResult) throw new Error('Analysis failed');
 
       // Step 4: Generate Summary
-      const summaryResult = await generateSummary(executionResult.executionId);
+      const summaryResult = await generateSummary(executionResult.executionId, 'INTELLIGENT');
       if (!summaryResult) throw new Error('Summary generation failed');
 
       return {

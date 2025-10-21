@@ -89,7 +89,7 @@ export interface SummaryResult {
   structured_data?: StructuredSummary;
 }
 
-export type SummaryFormat = 'TEXT' | 'MARKDOWN' | 'JSON' | 'HTML';
+export type SummaryFormat = 'TEXT' | 'MARKDOWN' | 'JSON' | 'HTML' | 'INTELLIGENT';
 
 export interface StructuredSummary {
   answer: string;
